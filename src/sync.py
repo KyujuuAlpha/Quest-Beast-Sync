@@ -8,8 +8,8 @@ BSABER_API_BOOKMARKS_URL = "https://bsaber.com/wp-json/bsaber-api/songs/?bookmar
 BSAVER_API_DOWNLOAD_URL = "https://api.beatsaver.com/download/key/"
 
 # Folder constants
-# CUSTOM_LEVEL_FOLDER = "/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels"
-CUSTOM_LEVEL_FOLDER = "./CustomLevels"
+CUSTOM_LEVEL_FOLDER = "/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels"
+# CUSTOM_LEVEL_FOLDER = "./CustomLevels"
 
 # retrieve bookmarked songs for BeastSaber user for a specified page
 def get_bsaber_songs(user, page):
