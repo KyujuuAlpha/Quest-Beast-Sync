@@ -1,0 +1,21 @@
+#:kivy 2.0.0
+<MainScreen>:
+    status: status_label
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: 25
+        MDLabel:
+            text: "Quest Beast Sync"
+        MDBoxLayout:
+            orientation: "vertical"
+            MDTextField:
+                hint_text: "Beast Saber Username"
+            MDRaisedButton:
+                text: "Synchronize"
+                on_press: root.sync()
+        MDLabel:
+            id: status_label
+            text: "No current actions"
+        MDRaisedButton:
+            text: "Exit App"
+            on_press: print("ouch! More gently please")
