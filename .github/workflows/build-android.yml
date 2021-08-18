@@ -21,5 +21,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ steps.buildozer.outputs.filename }}
+          name: app-apk
           path: ${{ steps.buildozer.outputs.filename }}

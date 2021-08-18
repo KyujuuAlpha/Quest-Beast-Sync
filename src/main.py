@@ -1,6 +1,7 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivy.clock import mainthread
+from android.permissions import Permission, request_permissions
 
 import sync
 import threading
@@ -20,6 +21,10 @@ class MainScreen(MDScreen):
         self.status.text = text
 
     def download_thread(self):
+        # check if path exists
+        sync.safe_path_check()
+
+        # retrieve user
         bsaber_user = self.user.text
 
         # logic for one page
@@ -51,7 +56,6 @@ class MainScreen(MDScreen):
             self.set_status_text("Please enter BeastSaber username!")
             return
         
-        sync.safe_path_check()
         self.set_in_progress(True)
         threading.Thread(target = (self.download_thread)).start()
 
@@ -65,6 +69,8 @@ class MainApp(MDApp):
         self.theme_cls.primary_palette = "Teal"
         return MainScreen()
 
-# main function, run the app
 if __name__ == "__main__":
+    # make sure permissions are satisfied
+    request_permissions([Permission.INTERNET, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+    # run the app
     MainApp().run()
