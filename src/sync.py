@@ -2,7 +2,6 @@ import requests
 import zipfile
 import os
 
-
 # URL constants
 BSABER_API_BOOKMARKS_URL = "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by="
 BSAVER_API_DOWNLOAD_URL = "https://api.beatsaver.com/download/key/"
@@ -37,17 +36,18 @@ def download_song(song):
     # construct the download url and download location
     song_url = BSAVER_API_DOWNLOAD_URL + song["song_key"]
     extract_location = CUSTOM_LEVEL_FOLDER + song["hash"]
-    download_location = song["hash"]  + ".zip"
+    download_location = song["hash"] + ".zip"
 
     # basic check if it already exists or not
     if os.path.exists(extract_location) == False:
-        # download the file
-        print("downloading from: " + song_url)
-        data = requests.get(song_url)
-        with open(download_location, "wb") as file:
-            file.write(data.content)
+        # download the file (streaming)
+        with requests.get(song_url, stream=True) as response:
+            # write the file (in chunks)
+            with open(download_location, "wb") as file:
+                for data_chunk in response.iter_content(chunk_size=1024):
+                    if data_chunk:
+                        file.write(data_chunk)
         
-        print ("Extracting: " + download_location)
         # extract the file
         with zipfile.ZipFile(download_location, "r") as zip_file:
             zip_file.extractall(extract_location)
@@ -55,5 +55,4 @@ def download_song(song):
         # remove the zip file
         os.remove(download_location)
     else:
-        print(extract_location + " already exists")
         return False
