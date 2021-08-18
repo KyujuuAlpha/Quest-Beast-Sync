@@ -1,9 +1,7 @@
-import sys
 import requests
-import random
-import time
 import wget
-import os.path
+import zipfile
+import os
 
 # URL constants
 BSABER_API_BOOKMARKS_URL = "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by="
@@ -14,7 +12,6 @@ BSAVER_API_DOWNLOAD_URL = "https://api.beatsaver.com/download/key/"
 CUSTOM_LEVEL_FOLDER = "./CustomLevels"
 
 # retrieve bookmarked songs for BeastSaber user for a specified page
-# {"title":"Darling Dance(YuNi Cover) - Kairiki Bear","song_key":"1b49e","hash":"57431519f148298175a53720b68907a6f4a52456","level_author_name":"Emir"}
 def get_bsaber_songs(user, page):
     # build and send the bsaber GET request
     page_url = "" if page == 1 else ("&page=" + str(page))
@@ -30,23 +27,36 @@ def get_bsaber_songs(user, page):
     # return the data
     return bsaber_json["songs"], bsaber_json["next_page"]
 
-if __name__ == "__main__":
-    bsaber_user = "enthri"
-    
+# verify if the custom levels path exists or not
+def safe_path_check():
     if os.path.exists(CUSTOM_LEVEL_FOLDER) == False:
-        print("Folder does not exist, creating..")
+        # create folder if it does not exist
         os.mkdir(CUSTOM_LEVEL_FOLDER)
-    
-    songs, next_page = get_bsaber_songs(bsaber_user, 1)
-    if songs != None:
-        for song in songs:
-            song_url = BSAVER_API_DOWNLOAD_URL + song["song_key"]
-            download_location = CUSTOM_LEVEL_FOLDER + "/" + song["hash"] + ".zip"
-            if os.path.exists(download_location) == False:
+
+# download a single song from beatsaver, returns true if it downloads
+def download_song(song):
+    # construct the download url and download location
+    song_url = BSAVER_API_DOWNLOAD_URL + song["song_key"]
+    extract_location = CUSTOM_LEVEL_FOLDER + "/" + song["hash"] 
+    download_location = extract_location + ".zip"
+
+    # basic check if it already exists or not
+    if os.path.exists(extract_location) == False:
+        # download file if it doesn't exist
+        if os.path.exists(download_location) == False:
+            # try download the file
+            try:
                 wget.download(song_url, download_location)
-            else:
-                print("Song exists..")
+            except Exception as err:
+                # don't handle exceptions in this function :)
+                raise
+        
+        # extract the file
+        with zipfile.ZipFile(download_location, "r") as zip_file:
+            zip_file.extractall(extract_location)
+
+        # remove the zip file
+        os.remove(download_location)
+        return True
     else:
-        print("Songs not found!")
-        exit(1)
-    print(next_page)
+        return False

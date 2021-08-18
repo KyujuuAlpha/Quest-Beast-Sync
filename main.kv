@@ -1,21 +1,32 @@
 #:kivy 2.0.0
 <MainScreen>:
     status: status_label
+    user: user_input
+    button: sync_button
+    spinner: spinner
     MDBoxLayout:
         orientation: "vertical"
         padding: 25
         MDLabel:
             text: "Quest Beast Sync"
         MDBoxLayout:
-            orientation: "vertical"
+            orientation: "horizontal"
+            spacing: 25
             MDTextField:
+                id: user_input
                 hint_text: "Beast Saber Username"
             MDRaisedButton:
+                id: sync_button
                 text: "Synchronize"
                 on_press: root.sync()
+            MDSpinner:
+                id: spinner
+                size_hint: None, None
+                size: dp(46), dp(46)
+                active: False
         MDLabel:
             id: status_label
             text: "No current actions"
         MDRaisedButton:
             text: "Exit App"
-            on_press: print("ouch! More gently please")
+            on_press: root.exit()
