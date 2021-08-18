@@ -21,5 +21,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: package
+          name: ${{ steps.buildozer.outputs.filename }}
           path: ${{ steps.buildozer.outputs.filename }}

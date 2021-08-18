@@ -65,4 +65,6 @@ class MainApp(MDApp):
         self.theme_cls.primary_palette = "Teal"
         return MainScreen()
 
-MainApp().run()
+# main function, run the app
+if __name__ == "__main__":
+    MainApp().run()
