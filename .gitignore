@@ -133,3 +133,4 @@ dmypy.json
 # artifacts
 CustomLevels/
 .buildozer
+bin/
