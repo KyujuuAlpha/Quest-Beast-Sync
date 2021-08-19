@@ -16,6 +16,7 @@ THREAD_SPAWN_DELAY = 0.2
 # main root widget
 class MainScreen(MDScreen):
 
+    # counters for status updates
     download_counter = 0
     download_max = 0
 
@@ -72,7 +73,7 @@ class MainScreen(MDScreen):
             next_page = 1
             while True:
                 # retrieve songs from bsaber
-                self.set_status_text("Retrieving downloads from BeastSaber page " + str(next_page))
+                self.set_status_text("Retrieving downloads for " + bsaber_user + " from page " + str(next_page))
 
                 # retrieve songs from bsaber for the current page
                 songs, next_page = sync.get_bsaber_songs(bsaber_user, next_page)
@@ -104,7 +105,7 @@ class MainScreen(MDScreen):
                     for thread in threads:
                         thread.join()
                 else:
-                    self.set_status_text("User has no bookmarked songs!")
+                    self.set_status_text(bsaber_user + " has no bookmarked songs!")
                     time.sleep(3)
 
                 # build the playlist
