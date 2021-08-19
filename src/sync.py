@@ -1,6 +1,7 @@
 import requests
 import zipfile
 import os
+import json
 
 # URL constants
 BSABER_API_BOOKMARKS_URL = "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by="
@@ -8,6 +9,7 @@ BSAVER_API_DOWNLOAD_URL = "https://api.beatsaver.com/download/key/"
 
 # Folder constants
 CUSTOM_LEVEL_FOLDER = "/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels/"
+CUSTOM_PLAYLIST_FOLDER = "/sdcard/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists/"
 
 # retrieve bookmarked songs for BeastSaber user for a specified page
 def get_bsaber_songs(user, page):
@@ -25,11 +27,17 @@ def get_bsaber_songs(user, page):
     # return the data
     return bsaber_json["songs"], bsaber_json["next_page"]
 
-# verify if the custom levels path exists or not
+# verify if the custom levels/playlists paths exists or not
 def safe_path_check():
+    # levels
     if os.path.exists(CUSTOM_LEVEL_FOLDER) == False:
         # create folder(s) if it does not exist
         os.makedirs(CUSTOM_LEVEL_FOLDER)
+    
+    # playlists
+    if os.path.exists(CUSTOM_PLAYLIST_FOLDER) == False:
+        # create folder(s) if it does not exist
+        os.makedirs(CUSTOM_PLAYLIST_FOLDER)
 
 # download a single song from beatsaver, returns true if it downloads
 def download_song(song):
@@ -56,3 +64,14 @@ def download_song(song):
         os.remove(download_location)
     else:
         return False
+
+# create a playlist for the given song list and user
+def create_playlist(song_list, user):
+    # construct the file location and data
+    playlist_location = CUSTOM_PLAYLIST_FOLDER + user + "_bookmarks.json"
+    playlist_data = {"playlistTitle": ("Bookmarks (" + user + ")"), "playlistAuthor": None, "playlistDescription": None,
+                     "songs": song_list, "image": None}
+    
+    # write the file
+    with open(playlist_location, "w") as playlist_file:
+        json.dump(playlist_data, playlist_file)

@@ -52,6 +52,9 @@ class MainScreen(MDScreen):
         bsaber_user = self.user.text
         next_page = 1
 
+        # song list for this user's playlist
+        playlist_songlist = []
+
         # keep looping until all pages are synced
         while True:
             # retrieve songs from bsaber
@@ -89,10 +92,20 @@ class MainScreen(MDScreen):
             else:
                 self.set_status_text("User has no bookmarked songs!")
 
+            # build the playlist
+            for song in songs:
+                song_entry = {"hash": song["hash"], "songName": song["title"]}
+                playlist_songlist.append(song_entry)
+
             # break if reached the end
             if next_page is None:
                 break
 
+        # create playlist for this user
+        self.set_status_text("Creating user playlist")
+        sync.create_playlist(playlist_songlist, bsaber_user)
+
+        # done sync
         self.set_status_text("Songs synchronized!")
         self.set_in_progress(False)
 
@@ -105,6 +118,7 @@ class MainScreen(MDScreen):
         # check if path exists
         sync.safe_path_check()
         
+        # lock the buttons and start the master download thread
         self.set_in_progress(True)
         threading.Thread(target = (self.download_thread)).start()
 
