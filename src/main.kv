@@ -10,12 +10,15 @@
         padding: 25
         MDLabel:
             text: "Quest Beast Sync"
+            font_size: 20
+        MDLabel:
+            text: "To synchronize with your BeastSaber bookmarks, enter your username below and click 'Synchronize.'  For multiple users, input usernames separated by a comma.  For example: 'user1,user2,user3'"
         MDBoxLayout:
             orientation: "horizontal"
             spacing: 25
             MDTextField:
                 id: user_input
-                hint_text: "Beast Saber Username"
+                hint_text: "Beast Saber Username(s)"
             MDRaisedButton:
                 id: sync_button
                 text: "Synchronize"
