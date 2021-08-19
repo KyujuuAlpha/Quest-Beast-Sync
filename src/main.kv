@@ -3,6 +3,7 @@
     status: status_label
     user: user_input
     button: sync_button
+    exit_button: exit_button
     spinner: spinner
     MDBoxLayout:
         orientation: "vertical"
@@ -28,5 +29,6 @@
             id: status_label
             text: "No current actions"
         MDRaisedButton:
+            id: exit_button
             text: "Exit App"
             on_press: root.exit()

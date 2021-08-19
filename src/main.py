@@ -23,6 +23,7 @@ class MainScreen(MDScreen):
     def set_in_progress(self, disabled):
         # lock the ui according to the disabled parameter
         self.user.disabled = disabled
+        self.exit_button.disabled = disabled
         self.button.disabled = disabled
         self.spinner.active = disabled
     
