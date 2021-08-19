@@ -49,66 +49,75 @@ class MainScreen(MDScreen):
             self.status_counter_increase()
 
     def download_thread(self):
-        # retrieve user
-        bsaber_user = self.user.text
-        next_page = 1
+        # split for multiple user support
+        users = self.user.text.split(",")
 
-        # song list for this user's playlist
-        playlist_songlist = []
+        # loop for multiple users
+        for user in users:
+            # retrieve user
+            bsaber_user = user.strip()
 
-        # keep looping until all pages are synced
-        while True:
-            # retrieve songs from bsaber
-            self.set_status_text("Retrieving downloads from BeastSaber page " + str(next_page))
+            # make sure it's a real user and not blank
+            if len(bsaber_user) == 0:
+                continue
 
-            # retrieve songs from bsaber for the current page
-            songs, next_page = sync.get_bsaber_songs(bsaber_user, next_page)
-            num_songs = len(songs)
+            # song list for this user's playlist
+            playlist_songlist = []
 
-            # if there are songs, then download and extract them
-            if songs != None and num_songs > 0:
-                threads = []
-                self.status_counter_reset(num_songs)
+            # keep looping until all pages are synced
+            next_page = 1
+            while True:
+                # retrieve songs from bsaber
+                self.set_status_text("Retrieving downloads from BeastSaber page " + str(next_page))
 
-                # if there are more dongs than the thread count, then split it up
-                if num_songs >= DOWNLOAD_THREAD_COUNT:
-                    chunk_size = math.floor(num_songs / DOWNLOAD_THREAD_COUNT)
-                    for i in range(0, DOWNLOAD_THREAD_COUNT):
-                        worker_song_list = []
-                        if i == DOWNLOAD_THREAD_COUNT - 1:
-                            worker_song_list = songs[(chunk_size * i):] # assign remaining songs to last worker
-                        else: 
-                            worker_song_list = songs[(chunk_size * i):(chunk_size * (i + 1))] # extract chunk of songs for each worker
-                        threads.append(threading.Thread(target = (self.song_download_worker), args=[worker_song_list]))
+                # retrieve songs from bsaber for the current page
+                songs, next_page = sync.get_bsaber_songs(bsaber_user, next_page)
+                num_songs = len(songs)
+
+                # if there are songs, then download and extract them
+                if songs != None and num_songs > 0:
+                    threads = []
+                    self.status_counter_reset(num_songs)
+
+                    # if there are more dongs than the thread count, then split it up
+                    if num_songs >= DOWNLOAD_THREAD_COUNT:
+                        chunk_size = math.floor(num_songs / DOWNLOAD_THREAD_COUNT)
+                        for i in range(0, DOWNLOAD_THREAD_COUNT):
+                            worker_song_list = []
+                            if i == DOWNLOAD_THREAD_COUNT - 1:
+                                worker_song_list = songs[(chunk_size * i):] # assign remaining songs to last worker
+                            else: 
+                                worker_song_list = songs[(chunk_size * i):(chunk_size * (i + 1))] # extract chunk of songs for each worker
+                            threads.append(threading.Thread(target = (self.song_download_worker), args=[worker_song_list]))
+                            threads[-1].start()
+                            time.sleep(THREAD_SPAWN_DELAY)
+                    else:
+                        # if not, just assign all songs to one thread
+                        threads.append(threading.Thread(target = (self.song_download_worker), args=[songs]))
                         threads[-1].start()
-                        time.sleep(THREAD_SPAWN_DELAY)
+                    
+                    # wait for workers to finish
+                    for thread in threads:
+                        thread.join()
                 else:
-                    # if not, just assign all songs to one thread
-                    threads.append(threading.Thread(target = (self.song_download_worker), args=[songs]))
-                    threads[-1].start()
-                
-                # wait for workers to finish
-                for thread in threads:
-                    thread.join()
-            else:
-                self.set_status_text("User has no bookmarked songs!")
+                    self.set_status_text("User has no bookmarked songs!")
 
-            # build the playlist
-            for song in songs:
-                song_entry = {"hash": song["hash"], "songName": song["title"]}
-                playlist_songlist.append(song_entry)
+                # build the playlist
+                for song in songs:
+                    song_entry = {"hash": song["hash"], "songName": song["title"]}
+                    playlist_songlist.append(song_entry)
 
-            # break if reached the end
-            if next_page is None:
-                break
+                # break if reached the end
+                if next_page is None:
+                    break
 
-        # create playlist for this user
-        self.set_status_text("Creating user playlist")
-        sync.create_playlist(playlist_songlist, bsaber_user)
+            # create playlist for this user
+            self.set_status_text("Creating user playlist")
+            sync.create_playlist(playlist_songlist, bsaber_user)
 
-        # done sync
-        self.set_status_text("Songs synchronized!")
-        self.set_in_progress(False)
+            # done sync
+            self.set_status_text("Songs synchronized!")
+            self.set_in_progress(False)
 
     # called when the synchronize button is pressed
     def sync(self):
