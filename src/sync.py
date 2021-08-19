@@ -11,6 +11,10 @@ BSAVER_API_DOWNLOAD_URL = "https://api.beatsaver.com/download/key/"
 CUSTOM_LEVEL_FOLDER = "/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels/"
 CUSTOM_PLAYLIST_FOLDER = "/sdcard/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists/"
 
+# App config constants
+APP_FOLDER = "/sdcard/QuestBeastSync/"
+SAVED_USERS = "saved_users.txt"
+
 # retrieve bookmarked songs for BeastSaber user for a specified page
 def get_bsaber_songs(user, page):
     # build and send the bsaber GET request
@@ -75,3 +79,32 @@ def create_playlist(song_list, user):
     # write the file
     with open(playlist_location, "w") as playlist_file:
         json.dump(playlist_data, playlist_file)
+
+# safely check the existence of the app folder
+def safe_app_path_check():
+    if os.path.exists(APP_FOLDER) == False:
+        # create folder(s) if it does not exist
+        os.makedirs(APP_FOLDER)
+
+# save the users input to a text file
+def save_users(users):
+    safe_app_path_check()
+
+    # write to the file location
+    with open(APP_FOLDER + SAVED_USERS, "w") as user_file:
+        user_file.write(users)
+
+# load the user text file
+def load_users():
+    safe_app_path_check()
+
+    user_file_location = APP_FOLDER + SAVED_USERS
+    user_text = ""
+
+    # attempt to read from the file location if it exists
+    if os.path.exists(user_file_location) == True:
+        with open(user_file_location, "r") as user_file:
+            user_text = user_file.readline()
+
+    # return result
+    return user_text

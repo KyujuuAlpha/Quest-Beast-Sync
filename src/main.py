@@ -19,6 +19,10 @@ class MainScreen(MDScreen):
     download_counter = 0
     download_max = 0
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user.text = sync.load_users()
+
     @mainthread
     def set_in_progress(self, disabled):
         # lock the ui according to the disabled parameter
@@ -101,6 +105,7 @@ class MainScreen(MDScreen):
                         thread.join()
                 else:
                     self.set_status_text("User has no bookmarked songs!")
+                    time.sleep(3)
 
                 # build the playlist
                 for song in songs:
@@ -112,8 +117,9 @@ class MainScreen(MDScreen):
                     break
 
             # create playlist for this user
-            self.set_status_text("Creating user playlist")
-            sync.create_playlist(playlist_songlist, bsaber_user)
+            if len(playlist_songlist) > 0:
+                self.set_status_text("Creating user playlist")
+                sync.create_playlist(playlist_songlist, bsaber_user)
 
             # done sync
             self.set_status_text("Songs synchronized!")
@@ -127,6 +133,9 @@ class MainScreen(MDScreen):
         
         # check if path exists
         sync.safe_path_check()
+
+        # save user input
+        sync.save_users(self.user.text)
         
         # lock the buttons and start the master download thread
         self.set_in_progress(True)
