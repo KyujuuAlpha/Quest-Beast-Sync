@@ -1,12 +1,23 @@
 # Quest Beast Sync
 
-Did not want to wait for SyncSaber to update, so created this app in the mean time.  This application synchronizes your BeastSaber bookmarks with your Beat Saber custom levels.
+This application synchronizes your BeastSaber bookmarks with your Beat Saber custom levels. This app was initially created for myself due to SyncSaber not being up to date, but I expanded upon it for the learning experience (I don't recommend writing an app in Python), it's simplicity, and for a feature I wanted not available using SyncSaber.
+
+![Android Build](https://github.com/KyujuuAlpha/Quest-Beast-Sync/actions/workflows/build-android/badge.svg)
+
+## Features
+
+- Beast Saber bookmark syncing
+- Multi-User syncing support (with playlist separation)
+
+## Known Bugs
+- Text deletion in the user input field is broken because of Android.  A workaround is to select the existing text and type over it.
 
 ## Usage
 
 1. Open the application under the `Unknown Sources` section on your Quest.
-2. Set the username to whatever BeastSaber user's bookmarks you want to synchronize (this does not delete local levels).
-3. Click synchronize and wait!
+2. Set the username to whatever BeastSaber user's bookmarks you want to synchronize (this does not delete local levels).  For multiple users, separate the usernames using commas.  For example: `user1,user2,user3`
+3. Click `Synchronize` and wait
+4. Open Beat Saber to play!
 
 ## Installation
 
