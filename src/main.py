@@ -9,8 +9,9 @@ import threading
 import math
 import time
 
+# thread constants
 DOWNLOAD_THREAD_COUNT = 6
-THREAD_SPAWN_DELAY = 1
+THREAD_SPAWN_DELAY = 0.2
 
 # main root widget
 class MainScreen(MDScreen):
@@ -49,40 +50,50 @@ class MainScreen(MDScreen):
     def download_thread(self):
         # retrieve user
         bsaber_user = self.user.text
+        next_page = 1
 
-        # logic for one page
-        self.set_status_text("Retrieving downloads from BeastSaber page 1")
+        # keep looping until all pages are synced
+        while True:
+            # retrieve songs from bsaber
+            self.set_status_text("Retrieving downloads from BeastSaber page " + str(next_page))
 
-        # retrieve songs from bsaber
-        songs, next_page = sync.get_bsaber_songs(bsaber_user, 1)
-        num_songs = len(songs)
+            # retrieve songs from bsaber for the current page
+            songs, next_page = sync.get_bsaber_songs(bsaber_user, next_page)
+            num_songs = len(songs)
 
-        # if there are songs, then download and extract them
-        if songs != None and num_songs > 0:
-            threads = []
-            self.status_counter_reset(num_songs)
-            if num_songs >= DOWNLOAD_THREAD_COUNT:
-                chunk_size = math.floor(num_songs / DOWNLOAD_THREAD_COUNT)
-                for i in range(0, DOWNLOAD_THREAD_COUNT):
-                    worker_song_list = []
-                    if i == DOWNLOAD_THREAD_COUNT - 1:
-                        worker_song_list = songs[(chunk_size * i):]
-                    else:
-                        worker_song_list = songs[(chunk_size * i):(chunk_size * (i + 1))]
-                    threads.append(threading.Thread(target = (self.song_download_worker), args=[worker_song_list]))
+            # if there are songs, then download and extract them
+            if songs != None and num_songs > 0:
+                threads = []
+                self.status_counter_reset(num_songs)
+
+                # if there are more dongs than the thread count, then split it up
+                if num_songs >= DOWNLOAD_THREAD_COUNT:
+                    chunk_size = math.floor(num_songs / DOWNLOAD_THREAD_COUNT)
+                    for i in range(0, DOWNLOAD_THREAD_COUNT):
+                        worker_song_list = []
+                        if i == DOWNLOAD_THREAD_COUNT - 1:
+                            worker_song_list = songs[(chunk_size * i):] # assign remaining songs to last worker
+                        else: 
+                            worker_song_list = songs[(chunk_size * i):(chunk_size * (i + 1))] # extract chunk of songs for each worker
+                        threads.append(threading.Thread(target = (self.song_download_worker), args=[worker_song_list]))
+                        threads[-1].start()
+                        time.sleep(THREAD_SPAWN_DELAY)
+                else:
+                    # if not, just assign all songs to one thread
+                    threads.append(threading.Thread(target = (self.song_download_worker), args=[songs]))
                     threads[-1].start()
-                    time.sleep(THREAD_SPAWN_DELAY)
+                
+                # wait for workers to finish
+                for thread in threads:
+                    thread.join()
             else:
-                threads.append(threading.Thread(target = (self.song_download_worker), args=[songs]))
-                threads[-1].start()
-            
-            for thread in threads:
-                thread.join()
+                self.set_status_text("User has no bookmarked songs!")
 
-            self.set_status_text("Songs synchronized!")
-        else:
-            self.set_status_text("User has no bookmarked songs!")
+            # break if reached the end
+            if next_page is None:
+                break
 
+        self.set_status_text("Songs synchronized!")
         self.set_in_progress(False)
 
     # called when the synchronize button is pressed
