@@ -1,6 +1,6 @@
 # Quest Beast Sync
 
-This application synchronizes your BeastSaber bookmarks with your Beat Saber custom levels. This app was initially created for myself due to SyncSaber not being up to date, but I expanded upon it for the learning experience (I don't recommend writing an app in Python), it's simplicity, and for a feature I wanted not available using SyncSaber.
+This application synchronizes your BeastSaber bookmarks with your Beat Saber custom levels. This app was initially created for myself due to SyncSaber not being up to date, but I expanded upon it for the learning experience (I don't recommend writing an app in Python), it's simplicity, and for a feature I wanted (that was not available using SyncSaber).
 
 ![Android Build](https://github.com/KyujuuAlpha/Quest-Beast-Sync/actions/workflows/build-android.yml/badge.svg)
 
