@@ -17,7 +17,7 @@ kivymd==0.104.2
 MarkupSafe==2.0.1
 pep517==0.6.0
 pexpect==4.8.0
-Pillow==9.0.0
+Pillow==9.3.0
 platformdirs==2.2.0
 ptyprocess==0.7.0
 Pygments==2.10.0
